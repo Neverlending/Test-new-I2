@@ -1,106 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MNG Transport API</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 { color: #D84315; }
-        #status {
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .test-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #D84315;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
+    <title>MANIT RANONG GROUP ส่วนบันทึกการขาย</title>
 </head>
 <body>
-    <div class="container">
-        <h1>MNG Transport API</h1>
-        <p>API Proxy for Manit Ranong Group Transport System</p>
-        <div id="status">Status: Checking connection...</div>
-        <button class="test-button" onclick="testConnection()">Test Connection</button>
-    </div>
-
-    <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCtdMq9dVnpUjzPIbab1FN8d8ajm0lHCzqrPTjOyqfL0DBgo_55V_aMY-3g268z2f7/exec';
-
-        async function testConnection() {
-            const statusDiv = document.getElementById('status');
-            
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'checkUser',
-                        username: 'test'
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    statusDiv.textContent = 'Status: Connected';
-                    statusDiv.style.color = 'green';
-                    console.log('Connection successful:', data);
-                } else {
-                    throw new Error(data.error || 'API response not ok');
-                }
-            } catch (error) {
-                statusDiv.textContent = 'Status: Connection Error';
-                statusDiv.style.color = 'red';
-                console.error('Connection error:', error);
-            }
-        }
-
-        // Auto test connection on load
-        window.onload = testConnection;
-
-        // Add fetch event listener for API proxy
-        self.addEventListener('fetch', event => {
-            const url = new URL(event.request.url);
-            
-            // Only handle requests to this domain
-            if (url.pathname === '/') {
-                event.respondWith(
-                    fetch(APPS_SCRIPT_URL, {
-                        method: event.request.method,
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: event.request.body,
-                        mode: 'cors'
-                    })
-                );
-            }
-        });
-    </script>
+    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbwR0_LkNlt2rLhWvW9s-4iDCAtZRm0D97WQMtZKznNPOgQMGZzJNQXWTA6k4GyRpHEE/exec" allow="camera" frameborder="0"></iframe>
 </body>
 </html>
