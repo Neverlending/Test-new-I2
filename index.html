@@ -4,171 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MNG Transport API</title>
-    <script>
-        // คอนฟิก URL ของ Google Apps Script
-        const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxnbl7xqOEHIlrKNw9j-jRXRTs5qLqzNk3Aqc4Sq9BN4cviVk8eMmVg5WGtX-ji280O/exec',
-            ALLOWED_ORIGINS: ['*'], // อนุญาตทุกโดเมนสำหรับการทดสอบ
-            TIMEOUT: 30000, // 30 วินาที
-        };
-
-        // ตัวจัดการ Cache
-        const CACHE = new Map();
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 นาที
-
-        // ฟังก์ชันสำหรับ retry
-        async function fetchWithRetry(url, options, retries = 3) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
-
-                    const response = await fetch(url, {
-                        ...options,
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-                    
-                    if (response.ok) return response;
-                    
-                    // จัดการ redirect
-                    if (response.status === 302) {
-                        const redirectUrl = response.headers.get('location');
-                        if (redirectUrl) {
-                            return fetch(redirectUrl, options);
-                        }
-                    }
-                    
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                } catch (error) {
-                    console.warn(`Attempt ${i + 1} failed:`, error.message);
-                    if (i === retries - 1) throw error;
-                    // รอก่อน retry
-                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
-                }
-            }
-        }
-
-        // ฟังก์ชันจัดการ Cache
-        function getCacheKey(action, data) {
-            return `${action}-${JSON.stringify(data)}`;
-        }
-
-        function setCacheResponse(key, response) {
-            CACHE.set(key, {
-                data: response,
-                timestamp: Date.now()
-            });
-        }
-
-        function getCachedResponse(key) {
-            const cached = CACHE.get(key);
-            if (!cached) return null;
-            
-            if (Date.now() - cached.timestamp > CACHE_DURATION) {
-                CACHE.delete(key);
-                return null;
-            }
-            
-            return cached.data;
-        }
-
-        // ฟังก์ชันหลักสำหรับจัดการ request
-        async function handleRequest(request) {
-            const headers = {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                'Access-Control-Max-Age': '86400',
-                'Content-Type': 'application/json'
-            };
-
-            // จัดการ CORS preflight
-            if (request.method === 'OPTIONS') {
-                return new Response(null, { headers });
-            }
-
-            try {
-                let requestData;
-                if (request.method === 'POST') {
-                    const text = await request.text();
-                    requestData = JSON.parse(text);
-                }
-
-                // ถ้าเป็น action ที่ cache ได้ (เช่น checkUser)
-                if (requestData?.action === 'checkUser') {
-                    const cacheKey = getCacheKey(requestData.action, requestData);
-                    const cachedResponse = getCachedResponse(cacheKey);
-                    if (cachedResponse) {
-                        return new Response(JSON.stringify(cachedResponse), { headers });
-                    }
-                }
-
-                // ส่ง request ไปที่ Apps Script
-                const response = await fetchWithRetry(CONFIG.APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestData)
-                });
-
-                const data = await response.json();
-
-                // cache เฉพาะ action ที่กำหนด
-                if (requestData?.action === 'checkUser') {
-                    const cacheKey = getCacheKey(requestData.action, requestData);
-                    setCacheResponse(cacheKey, data);
-                }
-
-                // อัพเดทสถานะการเชื่อมต่อ
-                updateConnectionStatus(true);
-
-                return new Response(JSON.stringify(data), { headers });
-
-            } catch (error) {
-                console.error('API Error:', error);
-                
-                // อัพเดทสถานะการเชื่อมต่อเมื่อเกิดข้อผิดพลาด
-                updateConnectionStatus(false);
-                
-                return new Response(JSON.stringify({
-                    success: false,
-                    error: 'API Error',
-                    message: error.message,
-                    timestamp: new Date().toISOString()
-                }), {
-                    headers,
-                    status: 500
-                });
-            }
-        }
-
-        // อัพเดทสถานะการเชื่อมต่อที่แสดงในหน้าเว็บ
-        function updateConnectionStatus(isConnected) {
-            const statusDiv = document.getElementById('status');
-            if (statusDiv) {
-                statusDiv.textContent = `Status: ${isConnected ? 'Connected' : 'Connection Error'}`;
-                statusDiv.style.color = isConnected ? 'green' : 'red';
-            }
-        }
-
-        // รับ request
-        addEventListener('fetch', event => {
-            event.respondWith(handleRequest(event.request));
-        });
-
-        // เช็คการเชื่อมต่อเมื่อโหลดหน้า
-        window.onload = async function() {
-            try {
-                await fetch(CONFIG.APPS_SCRIPT_URL, { method: 'OPTIONS' });
-                updateConnectionStatus(true);
-            } catch {
-                updateConnectionStatus(false);
-            }
-        };
-    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -184,16 +19,21 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #D84315;
-            margin-bottom: 20px;
-        }
+        h1 { color: #D84315; }
         #status {
             padding: 10px;
             border-radius: 4px;
-            background-color: #f8f9fa;
             margin-top: 20px;
             font-weight: bold;
+        }
+        .test-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #D84315;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -202,6 +42,65 @@
         <h1>MNG Transport API</h1>
         <p>API Proxy for Manit Ranong Group Transport System</p>
         <div id="status">Status: Checking connection...</div>
+        <button class="test-button" onclick="testConnection()">Test Connection</button>
     </div>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnbl7xqOEHIlrKNw9j-jRXRTs5qLqzNk3Aqc4Sq9BN4cviVk8eMmVg5WGtX-ji280O/exec';
+
+        async function testConnection() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'checkUser',
+                        username: 'test'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.textContent = 'Status: Connected';
+                    statusDiv.style.color = 'green';
+                    console.log('Connection successful:', data);
+                } else {
+                    throw new Error(data.error || 'API response not ok');
+                }
+            } catch (error) {
+                statusDiv.textContent = 'Status: Connection Error';
+                statusDiv.style.color = 'red';
+                console.error('Connection error:', error);
+            }
+        }
+
+        // Auto test connection on load
+        window.onload = testConnection;
+
+        // Add fetch event listener for API proxy
+        self.addEventListener('fetch', event => {
+            const url = new URL(event.request.url);
+            
+            // Only handle requests to this domain
+            if (url.pathname === '/') {
+                event.respondWith(
+                    fetch(APPS_SCRIPT_URL, {
+                        method: event.request.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: event.request.body,
+                        mode: 'cors'
+                    })
+                );
+            }
+        });
+    </script>
 </body>
 </html>
