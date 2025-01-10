@@ -6,8 +6,63 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
+    <!-- เพิ่ม Tailwind CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbzZ5By-AssORm73wbrn1PaIBYAAWoyDhpNYgjzz_OJiEh9Hem92Tt4wiHGTue44IJz2/exec" allow="camera" frameborder="0"></iframe>
+<body class="m-0 p-0">
+    <!-- Header ส่วนแสดงชื่อผู้ใช้ -->
+    <div id="userHeader" class="w-full bg-gradient-to-r from-blue-500 to-green-500 p-2 flex justify-between items-center">
+        <div class="text-white text-lg">MANIT RANONG GROUP</div>
+        <div class="flex items-center gap-4">
+            <div class="text-white text-sm">
+                ผู้ใช้: <span id="username" class="font-bold"></span>
+            </div>
+            <div class="flex bg-white rounded-full p-1 cursor-pointer" id="langToggle">
+                <img src="https://flagcdn.com/th.svg" alt="Thai" class="w-6 h-4" id="thFlag">
+                <img src="https://flagcdn.com/mm.svg" alt="Myanmar" class="w-6 h-4 ml-1 opacity-50" id="mmFlag">
+            </div>
+        </div>
+    </div>
+
+    <!-- iframe ส่วนหลัก -->
+    <iframe id="mainContent" style="width: 100%; height: calc(100vh - 48px);" scrolling="yes" 
+            src="https://script.google.com/macros/s/AKfycbzZ5By-AssORm73wbrn1PaIBYAAWoyDhpNYgjzz_OJiEh9Hem92Tt4wiHGTue44IJz2/exec" 
+            allow="camera" 
+            frameborder="0">
+    </iframe>
+
+    <script>
+        // ตรวจสอบและแสดงชื่อผู้ใช้
+        document.addEventListener('DOMContentLoaded', function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const usernameElement = document.getElementById('username');
+            
+            if (!loggedInUser) {
+                // ถ้าไม่มีข้อมูลผู้ใช้ให้ redirect กลับไปหน้า login
+                window.location.href = 'https://script.google.com/macros/s/AKfycbxZu1CW1Db1-uFfMVqZx-35yeUyVLCXqOV3C_GcNbxsfGiupMHTAo_hdqnlqNLkU_qMlA/exec';
+            } else {
+                // แสดงชื่อผู้ใช้
+                usernameElement.textContent = loggedInUser;
+            }
+
+            // จัดการการเปลี่ยนภาษา
+            const langToggle = document.getElementById('langToggle');
+            const thFlag = document.getElementById('thFlag');
+            const mmFlag = document.getElementById('mmFlag');
+            let currentLang = 'th';
+
+            langToggle.addEventListener('click', function() {
+                if (currentLang === 'th') {
+                    thFlag.classList.add('opacity-50');
+                    mmFlag.classList.remove('opacity-50');
+                    currentLang = 'mm';
+                } else {
+                    mmFlag.classList.add('opacity-50');
+                    thFlag.classList.remove('opacity-50');
+                    currentLang = 'th';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
