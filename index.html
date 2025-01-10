@@ -10,16 +10,26 @@
         body {
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
 
-        .header {
+        /* แยก header container */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
             background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
-            padding: 10px;
-            position: relative;
             height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        }
+
+        /* แยก user info container */
+        .user-container {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            z-index: 10000;
         }
 
         .user-info {
@@ -30,13 +40,21 @@
             font-family: sans-serif;
             font-size: 14px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-right: 20px;
         }
 
-        .container {
+        .site-title {
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 15px 0;
+            font-size: 24px;
+        }
+
+        .iframe-container {
             position: relative;
-            width: 100%;
-            height: calc(100vh - 60px); /* ลบความสูงของ header */
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
         }
 
         iframe {
@@ -47,13 +65,18 @@
     </style>
 </head>
 <body>
-    <!-- Header section -->
-    <div class="header">
-        <h1 style="color: white; margin: 0; font-size: 24px; flex-grow: 1; text-align: center;">MANIT RANONG GROUP</h1>
+    <!-- แยก Header -->
+    <div class="main-header">
+        <h1 class="site-title">MANIT RANONG GROUP</h1>
+    </div>
+
+    <!-- แยก User Info -->
+    <div class="user-container">
         <div id="userInfo" class="user-info"></div>
     </div>
     
-    <div class="container">
+    <!-- iframe container -->
+    <div class="iframe-container">
         <iframe scrolling="yes" 
                 src="https://script.google.com/macros/s/AKfycbzZ5By-AssORm73wbrn1PaIBYAAWoyDhpNYgjzz_OJiEh9Hem92Tt4wiHGTue44IJz2/exec" 
                 allow="camera">
@@ -61,35 +84,31 @@
     </div>
 
     <script>
-        function displayUserInfo() {
+        function checkAndDisplayUser() {
             const username = localStorage.getItem('loggedInUser');
-            console.log('Username from localStorage:', username);
-            
             const userInfoDiv = document.getElementById('userInfo');
-            console.log('UserInfo div:', userInfoDiv);
             
             if (username) {
                 const isThai = navigator.language.includes('th');
                 const displayText = isThai ? `ผู้ใช้: ${username}` : `အသုံးပြုသူ: ${username}`;
-                console.log('Display text:', displayText);
                 userInfoDiv.textContent = displayText;
-                userInfoDiv.style.display = 'block';
+                userInfoDiv.style.opacity = '1';
             } else {
-                console.log('No username found in localStorage');
-                userInfoDiv.style.display = 'none';
+                userInfoDiv.style.opacity = '0';
             }
         }
 
-        // เรียกใช้ฟังก์ชันเมื่อ DOM โหลดเสร็จ
-        document.addEventListener('DOMContentLoaded', displayUserInfo);
-        
-        // เรียกใช้ฟังก์ชันอีกครั้งเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
-        window.addEventListener('load', displayUserInfo);
+        // ตรวจสอบทุกๆ 1 วินาที
+        setInterval(checkAndDisplayUser, 1000);
 
-        // เพิ่มการตรวจสอบการเปลี่ยนแปลงใน localStorage
+        // ตรวจสอบเมื่อโหลดหน้า
+        document.addEventListener('DOMContentLoaded', checkAndDisplayUser);
+        window.addEventListener('load', checkAndDisplayUser);
+
+        // ตรวจสอบการเปลี่ยนแปลง localStorage
         window.addEventListener('storage', function(e) {
             if (e.key === 'loggedInUser') {
-                displayUserInfo();
+                checkAndDisplayUser();
             }
         });
     </script>
