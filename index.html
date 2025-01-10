@@ -7,32 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
     <style>
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
         .user-info {
-            position: fixed;
+            position: absolute;
             top: 10px;
             right: 20px;
-            z-index: 1000;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 5px 10px;
+            z-index: 9999; /* เพิ่มค่า z-index ให้อยู่ด้านบนสุด */
+            background-color: #dd4b39; /* สีส้มแดงตามธีมของเว็บ */
+            color: white;
+            padding: 8px 15px;
             border-radius: 5px;
             font-family: sans-serif;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
 <body>
-    <!-- Add user info display div -->
-    <div id="userInfo" class="user-info"></div>
-    
-    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbzZ5By-AssORm73wbrn1PaIBYAAWoyDhpNYgjzz_OJiEh9Hem92Tt4wiHGTue44IJz2/exec" allow="camera" frameborder="0"></iframe>
+    <div class="container">
+        <!-- User info display -->
+        <div id="userInfo" class="user-info"></div>
+        
+        <!-- iframe -->
+        <iframe scrolling="yes" 
+                src="https://script.google.com/macros/s/AKfycbzZ5By-AssORm73wbrn1PaIBYAAWoyDhpNYgjzz_OJiEh9Hem92Tt4wiHGTue44IJz2/exec" 
+                allow="camera">
+        </iframe>
+    </div>
 
     <script>
-        // Function to display user info
         function displayUserInfo() {
             const username = localStorage.getItem('loggedInUser');
             const userInfoDiv = document.getElementById('userInfo');
             
             if (username) {
-                // Check browser language for Thai/Myanmar
                 const isThai = navigator.language.includes('th');
                 userInfoDiv.textContent = isThai ? 
                     `ผู้ใช้: ${username}` : 
@@ -40,7 +57,7 @@
             }
         }
 
-        // Call the function when page loads
+        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้าเว็บ
         window.onload = displayUserInfo;
     </script>
 </body>
