@@ -89,8 +89,8 @@
     </iframe>
     <script>
         function displayUsername() {
-            // Changed from 'loggedInUser' to 'loggeduser' to match your requirement
-            const username = localStorage.getItem('loggeduser');
+            // เปลี่ยนเป็น loggedInUser ตามที่เก็บจริงใน localStorage
+            const username = localStorage.getItem('loggedInUser');
             const userInfo = document.getElementById('userInfo');
             
             if (username) {
@@ -104,8 +104,8 @@
             if (event.data && event.data.type === 'qrcode') {
                 const userInfo = document.getElementById('userInfo');
                 userInfo.textContent = event.data.value;
-                // Changed from 'loggedInUser' to 'loggeduser'
-                localStorage.setItem('loggeduser', event.data.value);
+                // เปลี่ยนเป็น loggedInUser ให้ตรงกับที่ใช้
+                localStorage.setItem('loggedInUser', event.data.value);
             }
         });
         
