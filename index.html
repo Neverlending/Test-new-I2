@@ -14,7 +14,7 @@
             font-family: 'Prompt', sans-serif;
         }
         .user-bar {
-            background-color: #DD4B1F;
+            background-color: #4A4A4A; /* Changed to gray */
             padding: 12px 20px;
             color: white;
             display: flex;
@@ -64,7 +64,7 @@
         }
         iframe {
             width: 100%;
-            height: calc(100vh - 115px); /* ปรับความสูงให้พอดีกับส่วนที่เหลือ */
+            height: calc(100vh - 115px);
             border: none;
         }
     </style>
@@ -87,19 +87,16 @@
             src="https://script.google.com/macros/s/AKfycbxr3fO6E322Y4vmXZjLfoCP8im6AEXegak84ymnFH1ZrFoJfFQ4_KpELV5GRBJs4FPWKQ/exec" 
             allow="camera">
     </iframe>
-
     <script>
         function displayUsername() {
             const username = localStorage.getItem('loggedInUser');
             const userInfo = document.getElementById('userInfo');
             
             if (username) {
-                userInfo.textContent = username; // แสดงเฉพาะชื่อ ไม่มีคำว่า "ผู้ใช้:"
+                userInfo.textContent = username;
             }
         }
-
         document.addEventListener('DOMContentLoaded', displayUsername);
-
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'qrcode') {
                 const userInfo = document.getElementById('userInfo');
@@ -107,7 +104,6 @@
                 localStorage.setItem('loggedInUser', event.data.value);
             }
         });
-
         setInterval(displayUsername, 1000);
     </script>
 </body>
