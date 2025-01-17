@@ -6,72 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
-    <style>
-        #displayUser {
-            position: fixed;
-            top: 15px;
-            right: 120px;
-            z-index: 10000;
-            background-color: #DD4B1F;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 4px;
-            font-family: sans-serif;
-        }
-    </style>
 </head>
 <body>
-    <div id="displayUser"></div>
-    
-    <iframe id="mainFrame" style="width: 100%; height: 100vh;" scrolling="yes" 
-        src="https://script.google.com/macros/s/AKfycbxr3fO6E322Y4vmXZjLfoCP8im6AEXegak84ymnFH1ZrFoJfFQ4_KpELV5GRBJs4FPWKQ/exec" 
-        allow="camera" frameborder="0">
-    </iframe>
-
-    <script>
-        // Debug function
-        function debugLog(message) {
-            console.log(message);
-        }
-
-        // Check and display user
-        function checkAndDisplayUser() {
-            debugLog('Checking for user...');
-            const user = localStorage.getItem('loggedInUser');
-            debugLog('User from localStorage:', user);
-            
-            if (user) {
-                const displayElement = document.getElementById('displayUser');
-                displayElement.textContent = 'ผู้ใช้: ' + user;
-                debugLog('Displaying user:', user);
-            }
-        }
-
-        // Run on page load
-        window.addEventListener('load', function() {
-            debugLog('Page loaded');
-            checkAndDisplayUser();
-        });
-
-        // Listen for messages
-        window.addEventListener('message', function(event) {
-            debugLog('Received message event:', event);
-            
-            if (event.data && event.data.type === 'qrcode') {
-                debugLog('QR code data received:', event.data);
-                const username = event.data.value;
-                
-                // Save to localStorage
-                localStorage.setItem('loggedInUser', username);
-                
-                // Update display
-                const displayElement = document.getElementById('displayUser');
-                displayElement.textContent = 'ผู้ใช้: ' + username;
-            }
-        });
-
-        // Check periodically (every 2 seconds)
-        setInterval(checkAndDisplayUser, 2000);
-    </script>
+    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbzJqqFfo1L2NWHCnxNQ5ptOSjrtMnluxdVuv97FqIAy9sQGbzlTz7bSwRZE32zPrwN16A/exec" allow="camera" frameborder="0"></iframe>
 </body>
 </html>
