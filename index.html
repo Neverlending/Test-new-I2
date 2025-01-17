@@ -6,50 +6,77 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
         .floating-user {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background-color: #DD4B1F;
-            color: white;
+            top: 10px;
+            right: 20px; /* เปลี่ยนจาก left เป็น right */
+            background-color: white;
+            color: #DD4B1F;
             padding: 8px 16px;
             border-radius: 20px;
             font-family: 'Prompt', sans-serif;
             z-index: 9999;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: none;
+            font-size: 14px;
+            border: 2px solid #DD4B1F;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap');
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
     <div id="floatingUser" class="floating-user"></div>
-    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbxr3fO6E322Y4vmXZjLfoCP8im6AEXegak84ymnFH1ZrFoJfFQ4_KpELV5GRBJs4FPWKQ/exec" allow="camera" frameborder="0"></iframe>
+    <iframe scrolling="yes" src="https://script.google.com/macros/s/AKfycbxr3fO6E322Y4vmXZjLfoCP8im6AEXegak84ymnFH1ZrFoJfFQ4_KpELV5GRBJs4FPWKQ/exec" allow="camera"></iframe>
 
     <script>
-        // ฟังก์ชันสำหรับแสดงชื่อผู้ใช้
+        // ตรวจสอบและแสดงผู้ใช้เมื่อโหลดหน้า
         function displayUsername() {
             const username = localStorage.getItem('loggedInUser');
             const floatingUser = document.getElementById('floatingUser');
             
             if (username) {
-                floatingUser.textContent = username;
+                floatingUser.textContent = 'ผู้ใช้: ' + username; // เพิ่มคำว่า "ผู้ใช้:" นำหน้า
                 floatingUser.style.display = 'block';
             }
         }
 
-        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
-        window.onload = displayUsername;
+        // เรียกใช้งานฟังก์ชันเมื่อโหลดหน้า
+        document.addEventListener('DOMContentLoaded', displayUsername);
 
         // รับข้อความจาก iframe
         window.addEventListener('message', function(event) {
-            if (event.data.type === 'qrcode') {
+            if (event.data && event.data.type === 'qrcode') {
                 const floatingUser = document.getElementById('floatingUser');
-                floatingUser.textContent = event.data.value;
+                floatingUser.textContent = 'ผู้ใช้: ' + event.data.value;
                 floatingUser.style.display = 'block';
+                
+                // บันทึกลง localStorage
+                localStorage.setItem('loggedInUser', event.data.value);
             }
         });
+
+        // ตรวจสอบทุก 1 วินาทีว่ามีการเปลี่ยนแปลงใน localStorage หรือไม่
+        setInterval(() => {
+            const username = localStorage.getItem('loggedInUser');
+            const floatingUser = document.getElementById('floatingUser');
+            
+            if (username && floatingUser.style.display !== 'block') {
+                floatingUser.textContent = 'ผู้ใช้: ' + username;
+                floatingUser.style.display = 'block';
+            }
+        }, 1000);
     </script>
 </body>
 </html>
