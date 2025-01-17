@@ -89,21 +89,26 @@
     </iframe>
     <script>
         function displayUsername() {
-            const username = localStorage.getItem('loggedInUser');
+            // Changed from 'loggedInUser' to 'loggeduser' to match your requirement
+            const username = localStorage.getItem('loggeduser');
             const userInfo = document.getElementById('userInfo');
             
             if (username) {
                 userInfo.textContent = username;
             }
         }
+        
         document.addEventListener('DOMContentLoaded', displayUsername);
+        
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'qrcode') {
                 const userInfo = document.getElementById('userInfo');
                 userInfo.textContent = event.data.value;
-                localStorage.setItem('loggedInUser', event.data.value);
+                // Changed from 'loggedInUser' to 'loggeduser'
+                localStorage.setItem('loggeduser', event.data.value);
             }
         });
+        
         setInterval(displayUsername, 1000);
     </script>
 </body>
