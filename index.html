@@ -7,61 +7,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
     <style>
-        .header-text {
+        #userDisplay {
             position: fixed;
             top: 10px;
             right: 100px;
             z-index: 9999;
             color: white;
-            font-size: 16px;
             font-family: 'Prompt', sans-serif;
+            font-size: 16px;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="userDisplay" class="header-text"></div>
+    <div id="userDisplay"></div>
     
     <iframe id="mainFrame" style="width: 100%; height: 100vh;" scrolling="yes" 
-        src="https://script.google.com/macros/s/AKfycbwQJQaBKUraigf1Va9A6egSGb9AyP4pOjPCf4SEhZ7y18H63TV6fnR2k9DNwzawkRULHQ/exec" 
+        src="https://script.google.com/macros/s/AKfycbxr3fO6E322Y4vmXZjLfoCP8im6AEXegak84ymnFH1ZrFoJfFQ4_KpELV5GRBJs4FPWKQ/exec" 
         allow="camera" frameborder="0">
     </iframe>
 
     <script>
-        function displayUser() {
-            // ดึงค่าจาก iframe's localStorage
-            try {
-                const frame = document.getElementById('mainFrame');
-                const frameWindow = frame.contentWindow;
-                const user = frameWindow.localStorage.getItem('loggedInUser');
-                
-                if (user) {
-                    document.getElementById('userDisplay').textContent = 'ผู้ใช้: ' + user;
-                }
-            } catch (error) {
-                console.log('Error accessing localStorage:', error);
+        // แสดงผู้ใช้จาก localStorage เมื่อโหลดหน้า
+        window.onload = function() {
+            const user = localStorage.getItem('loggedInUser');
+            if (user) {
+                document.getElementById('userDisplay').textContent = 'ผู้ใช้: ' + user;
             }
-
-            // ดึงค่าจาก parent's localStorage
-            const parentUser = localStorage.getItem('loggedInUser');
-            if (parentUser) {
-                document.getElementById('userDisplay').textContent = 'ผู้ใช้: ' + parentUser;
-            }
-        }
-
-        // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
-        window.onload = displayUser;
+        };
 
         // รับข้อมูลจาก postMessage
         window.addEventListener('message', function(event) {
+            console.log('Received message:', event.data);
+            
             if (event.data && event.data.type === 'qrcode') {
                 const username = event.data.value;
                 document.getElementById('userDisplay').textContent = 'ผู้ใช้: ' + username;
                 localStorage.setItem('loggedInUser', username);
             }
         });
-
-        // อัพเดทการแสดงผลทุก 1 วินาที
-        setInterval(displayUser, 1000);
     </script>
 </body>
 </html>
