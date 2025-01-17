@@ -88,28 +88,32 @@
             allow="camera">
     </iframe>
     <script>
-        function displayUsername() {
-            // เปลี่ยนเป็น loggedInUser ตามที่เก็บจริงใน localStorage
-            const username = localStorage.getItem('loggedInUser');
-            const userInfo = document.getElementById('userInfo');
-            
-            if (username) {
-                userInfo.textContent = username;
-            }
+         // ฟังก์ชันแสดงชื่อผู้ใช้
+    function displayUsername() {
+        const username = localStorage.getItem('loggedInUser');
+        const userInfoElement = document.getElementById('userInfo');
+        
+        if (username && userInfoElement) {
+            userInfoElement.textContent = username;
+            console.log('Updated username:', username); // เพิ่ม log เพื่อดีบัก
         }
+    }
+
+    // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
+    displayUsername();
+
+    // รับข้อมูลจาก iframe
+    window.addEventListener('message', function(event) {
+        console.log('Received message:', event.data); // เพิ่ม log เพื่อดีบัก
         
-        document.addEventListener('DOMContentLoaded', displayUsername);
-        
-        window.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'qrcode') {
-                const userInfo = document.getElementById('userInfo');
-                userInfo.textContent = event.data.value;
-                // เปลี่ยนเป็น loggedInUser ให้ตรงกับที่ใช้
-                localStorage.setItem('loggedInUser', event.data.value);
-            }
-        });
-        
-        setInterval(displayUsername, 1000);
+        if (event.data && event.data.type === 'qrcode' && event.data.value) {
+            localStorage.setItem('loggedInUser', event.data.value);
+            displayUsername();
+        }
+    });
+
+    // อัพเดททุก 1 วินาที
+    setInterval(displayUsername, 1000);
     </script>
 </body>
 </html>
