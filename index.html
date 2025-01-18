@@ -6,8 +6,43 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANIT RANONG GROUP</title>
+    <style>
+        /* CSS สำหรับปุ่มออกจากระบบ */
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #d33;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .logout-button:hover {
+            background-color: #b02a2a;
+        }
+    </style>
 </head>
 <body>
-    <iframe style="width: 100%; height: 100vh;" scrolling="yes" src="https://script.google.com/macros/s/AKfycbzF8FTm4Pyfi1PcNLcY-r7IOIEaOjPw7Ser-RDkSB4vlsPdLrMrfAvEnKcorCELWmp1hg/exec" allow="camera" frameborder="0"></iframe>
+    <!-- ปุ่มออกจากระบบ -->
+    <button class="logout-button" onclick="logout()">ออกจากระบบ</button>
+    
+    <!-- iframe สำหรับแสดงเนื้อหาจากลิงค์ที่กำหนด -->
+    <iframe style="width: 100%; height: 100vh;" scrolling="yes" 
+            src="https://script.google.com/macros/s/AKfycbyuitWP_krrxeJImQespQ_3zqaAkeeca2117__M2f-bms3905LWdgbGzPaq-Artcxjyjg/exec" 
+            allow="camera" frameborder="0"></iframe>
+
+    <script>
+        // ฟังก์ชันสำหรับปุ่มออกจากระบบ
+        function logout() {
+            // สามารถเพิ่มคำถามการยืนยันการออกจากระบบได้ที่นี่ถ้าต้องการ
+            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                // รีเฟรชหน้าเว็บนี้
+                location.reload(); // ใช้ location.reload() เพื่อรีเฟรชหน้า
+            }
+        }
+    </script>
 </body>
 </html>
