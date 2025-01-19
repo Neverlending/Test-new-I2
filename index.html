@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +16,7 @@
             flex-direction: column;
         }
         .header {
-            display: none; /* ซ่อนปุ่มตั้งแต่เริ่มต้น */
+            display: none;
             justify-content: flex-end;
             padding: 10px 20px;
             background: transparent;
@@ -65,17 +64,47 @@
                 id="myIframe"></iframe>
     </div>
     <script>
-        // เพิ่มโค้ดนี้ใน script ของหน้าหลัก
+        let inactivityTimer;
+        const LOGOUT_TIME = 30000; // 30 seconds in milliseconds
+
+        // Function to reset the timer
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(autoLogout, LOGOUT_TIME);
+        }
+
+        // Function to handle automatic logout
+        async function autoLogout() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                localStorage.removeItem('currentUser');
+                await Swal.fire({
+                    title: 'ออกจากระบบอัตโนมัติ',
+                    text: 'คุณไม่ได้ใช้งานระบบเป็นเวลา 30 วินาที',
+                    icon: 'info',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                location.reload();
+            }
+        }
+
+        // Setup event listeners for user activity
         window.addEventListener('load', function() {
             const currentUser = localStorage.getItem('currentUser');
             if (currentUser) {
-                // ถ้ามี user login อยู่ ให้แสดงปุ่ม logout
                 const header = document.querySelector('.header');
                 header.classList.add('show');
+                resetTimer();
+                
+                // Add event listeners for user activity
+                document.addEventListener('mousemove', resetTimer);
+                document.addEventListener('keypress', resetTimer);
+                document.addEventListener('click', resetTimer);
+                document.addEventListener('scroll', resetTimer);
             }
         });
         
-        // ปรับฟังก์ชัน logout
         async function logout() {
             const result = await Swal.fire({
                 title: 'ออกจากระบบ',
@@ -87,7 +116,6 @@
             });
         
             if (result.isConfirmed) {
-                // ลบข้อมูล user จาก localStorage
                 localStorage.removeItem('currentUser');
                 
                 await Swal.fire({
@@ -97,7 +125,6 @@
                     showConfirmButton: false
                 });
                 
-                // รีโหลดหน้าเว็บ
                 location.reload();
             }
         }
