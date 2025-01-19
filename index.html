@@ -67,16 +67,16 @@
 
         // แก้ไขส่วน JavaScript ในหน้า HTML หลัก
         window.addEventListener('message', function(event) {
-            // Debug: ดูข้อมูลที่ได้รับ
             console.log('Received message:', event.data);
             
-            // ตรวจสอบข้อมูลที่ได้รับจาก iframe หลังจาก Swal แสดงเสร็จ
             if (event.data.type === 'qrcode' && event.data.status === 'scanComplete') {
-                // แสดงปุ่มออกจากระบบทันที
-                var header = document.querySelector('.header');
-                if (header) {
-                    header.classList.add('show');
-                }
+                // รอ 2 วินาทีก่อนแสดงปุ่ม
+                setTimeout(() => {
+                    var header = document.querySelector('.header');
+                    if (header) {
+                        header.classList.add('show');
+                    }
+                }, 2000);
             }
         });
 
