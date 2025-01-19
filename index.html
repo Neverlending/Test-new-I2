@@ -15,28 +15,26 @@
             flex-direction: column;
         }
         .header {
-            display: none;
+            display: none; /* ซ่อนปุ่มตั้งแต่เริ่มต้น */
             justify-content: flex-end;
             padding: 10px 20px;
             background: transparent;
-            position: fixed; /* เปลี่ยนจาก absolute เป็น fixed */
-            top: 130px; /* ปรับตำแหน่งให้อยู่ด้านบนมากขึ้น */
-            right: 20px;
-            z-index: 9999; /* เพิ่ม z-index ให้สูงขึ้น */
+            position: absolute;
+            top: 125px;
+            right: 0;
+            z-index: 1000;
+        }
+        .header.show {
+            display: flex;
         }
         .logout-button {
             padding: 10px 20px;
-            background-color: rgba(255, 255, 255, 0.2); /* เพิ่มพื้นหลังให้เห็นชัดขึ้น */
+            background: none;
             color: white;
-            border: 1px solid white; /* เพิ่มเส้นขอบ */
-            border-radius: 5px; /* เพิ่มความโค้งมน */
+            border: none;
             cursor: pointer;
             font-family: 'Prompt', sans-serif;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-        .logout-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+            font-size: 20px;
         }
         .iframe-container {
             flex: 1;
@@ -50,7 +48,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
         }
     </style>
 </head>
@@ -60,49 +57,27 @@
     </div>
     <div class="iframe-container">
         <iframe scrolling="yes" 
-                src="https://script.google.com/macros/s/AKfycbxb_1tHdr0ayC26RTZPN5Dtj89o_t7ZBPsS7nWEsz9djXeJNq7ICnEl39WRCnh3cwUzxg/exec" 
+                src="https://script.google.com/macros/s/AKfycbyePm12vkBQloT7GjmeEbjlFnTiK7YWXGAmViCQYLz2FeK9OyN7jPxbwizsXi_NqrlkXQ/exec" 
                 allow="camera" 
                 frameborder="0"
-                onload="handleFrameLoad()"></iframe>
+                id="myIframe"></iframe>
     </div>
-    <script>
-        // เพิ่มการตรวจสอบ URL เพื่อแสดงปุ่ม
-        function checkURLAndShowButton() {
-            const iframe = document.querySelector('iframe');
-            try {
-                const iframeURL = iframe.contentWindow.location.href;
-                if (iframeURL.includes('success') || iframeURL.includes('complete')) {
-                    document.querySelector('.header').style.display = 'flex';
-                }
-            } catch (e) {
-                // ถ้าเกิด error ให้ใช้วิธีนับการโหลดแทน
-                handleFrameLoad();
-            }
-        }
 
-        let loadCount = 0;
-        
-        function handleFrameLoad() {
-            loadCount++;
-            if (loadCount > 1) {
-                // แสดงปุ่มทันทีที่โหลดครั้งที่ 2
-                document.querySelector('.header').style.display = 'flex';
+    <script>
+        // แก้ไขการรับข้อความ
+        window.addEventListener('message', function(event) {
+            // ตรวจสอบข้อความและประเภทข้อมูล
+            if (event.data.type === 'qrcode' && event.data.status === 'scanComplete') {
+                // แสดงปุ่มออกจากระบบ
+                document.querySelector('.header').classList.add('show');
             }
-            
-            // เพิ่มการตรวจสอบทุก 1 วินาที
-            setInterval(checkURLAndShowButton, 1000);
-        }
+        });
 
         function logout() {
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
                 location.reload();
             }
         }
-
-        // เพิ่มการแสดงปุ่มเมื่อกดปุ่ม back ใน browser
-        window.onpopstate = function(event) {
-            document.querySelector('.header').style.display = 'flex';
-        };
     </script>
 </body>
 </html>
