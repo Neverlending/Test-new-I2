@@ -57,7 +57,7 @@
     </div>
     <div class="iframe-container">
         <iframe scrolling="yes" 
-                src="https://script.google.com/macros/s/AKfycbxslDlTTdH3G8G4cVwi6TpDNc7vomy6RfKqlWxNAXccDhJDxnMDN4kthj9Ed0_gtjytqA/exec" 
+                src="https://script.google.com/macros/s/AKfycbx20xdt7UpeQi2pW7VSo3kdNMGQW4lVTM3t3uuf4xY7_kF5wy-AFZgquuFBt4aYxG71/exec" 
                 allow="camera" 
                 frameborder="0"
                 id="myIframe"></iframe>
@@ -65,23 +65,7 @@
 
     <script>
 
-        // แก้ไขส่วน JavaScript ในหน้า HTML หลัก
-        window.addEventListener('message', function(event) {
-            console.log('Received message:', event.data);
-            
-            if (event.data.type === 'qrcode') {
-                if (event.data.status === 'showLogout') {
-                    var header = document.querySelector('.header');
-                    if (header) {
-                        header.classList.add('show');
-                    }
-                } else if (event.data.status === 'redirect') {
-                    setTimeout(() => {
-                        window.location.href = event.data.url;
-                    }, 2000);
-                }
-            }
-        });
+       
 
         async function logout() {
             const result = await Swal.fire({
