@@ -64,22 +64,19 @@
     </div>
 
     <script>
-        // แก้ไขการรับข้อความ
+
+        // แก้ไขส่วน JavaScript ในหน้า HTML หลัก
         window.addEventListener('message', function(event) {
             // Debug: ดูข้อมูลที่ได้รับ
             console.log('Received message:', event.data);
             
-            // ตรวจสอบข้อมูลที่ได้รับ
+            // ตรวจสอบข้อมูลที่ได้รับจาก iframe หลังจาก Swal แสดงเสร็จ
             if (event.data.type === 'qrcode' && event.data.status === 'scanComplete') {
-                // รอ 2 วินาทีแล้วค่อยแสดงปุ่ม
-                setTimeout(function() {
-                    var header = document.querySelector('.header');
-                    if (header) {
-                        header.classList.add('show');
-                        // หรือใช้ style.display ถ้าต้องการ
-                        // header.style.display = 'flex';
-                    }
-                }, 2000);
+                // แสดงปุ่มออกจากระบบทันที
+                var header = document.querySelector('.header');
+                if (header) {
+                    header.classList.add('show');
+                }
             }
         });
 
