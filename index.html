@@ -57,7 +57,7 @@
     </div>
     <div class="iframe-container">
         <iframe scrolling="yes" 
-                src="https://script.google.com/macros/s/AKfycbxffbqgYI9xcBPkCB3hVpr_tmobVv9Mor8wwSVAfgA1KU-gy8cFixEIP8JBxh-TdDdEZA/exec" 
+                src="https://script.google.com/macros/s/AKfycbxslDlTTdH3G8G4cVwi6TpDNc7vomy6RfKqlWxNAXccDhJDxnMDN4kthj9Ed0_gtjytqA/exec" 
                 allow="camera" 
                 frameborder="0"
                 id="myIframe"></iframe>
@@ -69,19 +69,40 @@
         window.addEventListener('message', function(event) {
             console.log('Received message:', event.data);
             
-            if (event.data.type === 'qrcode' && event.data.status === 'scanComplete') {
-                // รอ 2 วินาทีก่อนแสดงปุ่ม
-                setTimeout(() => {
+            if (event.data.type === 'qrcode') {
+                if (event.data.status === 'showLogout') {
                     var header = document.querySelector('.header');
                     if (header) {
                         header.classList.add('show');
                     }
-                }, 2000);
+                } else if (event.data.status === 'redirect') {
+                    setTimeout(() => {
+                        window.location.href = event.data.url;
+                    }, 2000);
+                }
             }
         });
 
-        function logout() {
-            if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+        async function logout() {
+            const result = await Swal.fire({
+                title: 'ออกจากระบบ',
+                text: 'คุณต้องการออกจากระบบใช่หรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่',
+                cancelButtonText: 'ยกเลิก'
+            });
+        
+            if (result.isConfirmed) {
+                // แสดง Swal อีกครั้งเพื่อบอกว่าออกจากระบบสำเร็จ
+                await Swal.fire({
+                    title: 'ออกจากระบบสำเร็จ',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                
+                // รีโหลดหน้าเว็บ
                 location.reload();
             }
         }
