@@ -64,47 +64,14 @@
                 id="myIframe"></iframe>
     </div>
     <script>
-        let inactivityTimer;
-        const LOGOUT_TIME = 30000; // 30 seconds in milliseconds
-
-        // Function to reset the timer
-        function resetTimer() {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(autoLogout, LOGOUT_TIME);
-        }
-
-        // Function to handle automatic logout
-        async function autoLogout() {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
-                localStorage.removeItem('currentUser');
-                await Swal.fire({
-                    title: 'ออกจากระบบอัตโนมัติ',
-                    text: 'คุณไม่ได้ใช้งานระบบเป็นเวลา 30 วินาที',
-                    icon: 'info',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                location.reload();
-            }
-        }
-
-        // Setup event listeners for user activity
         window.addEventListener('load', function() {
-            const currentUser = localStorage.getItem('currentUser');
-            if (currentUser) {
+            // แสดงปุ่ม logout หลังผ่านไป 1 นาที
+            setTimeout(() => {
                 const header = document.querySelector('.header');
                 header.classList.add('show');
-                resetTimer();
-                
-                // Add event listeners for user activity
-                document.addEventListener('mousemove', resetTimer);
-                document.addEventListener('keypress', resetTimer);
-                document.addEventListener('click', resetTimer);
-                document.addEventListener('scroll', resetTimer);
-            }
+            }, 60000); // 60000 มิลลิวินาที = 1 นาที
         });
-        
+
         async function logout() {
             const result = await Swal.fire({
                 title: 'ออกจากระบบ',
@@ -114,17 +81,14 @@
                 confirmButtonText: 'ใช่',
                 cancelButtonText: 'ยกเลิก'
             });
-        
             if (result.isConfirmed) {
                 localStorage.removeItem('currentUser');
-                
                 await Swal.fire({
                     title: 'ออกจากระบบสำเร็จ',
                     icon: 'success',
                     timer: 1500,
                     showConfirmButton: false
                 });
-                
                 location.reload();
             }
         }
