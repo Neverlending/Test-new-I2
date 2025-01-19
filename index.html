@@ -15,12 +15,12 @@
             flex-direction: column;
         }
         .header {
-            display: flex;
+            display: none;  /* เริ่มต้นซ่อนปุ่ม */
             justify-content: flex-end;
             padding: 10px 20px;
             background: transparent;
             position: absolute;
-            top: 125px; /* ปรับตำแหน่งปุ่มลงมานิดหน่อย */
+            top: 125px;
             right: 0;
             z-index: 1000;
         }
@@ -52,13 +52,27 @@
     <div class="header">
         <button class="logout-button" onclick="logout()">ออกจากระบบ</button>
     </div>
-
     <div class="iframe-container">
         <iframe scrolling="yes" 
                 src="https://script.google.com/macros/s/AKfycbxb_1tHdr0ayC26RTZPN5Dtj89o_t7ZBPsS7nWEsz9djXeJNq7ICnEl39WRCnh3cwUzxg/exec" 
-                allow="camera" frameborder="0"></iframe>
+                allow="camera" 
+                frameborder="0"
+                onload="handleFrameLoad()"></iframe>
     </div>
     <script>
+        let loadCount = 0;
+        
+        function handleFrameLoad() {
+            loadCount++;
+            // iframe มักจะโหลด 2 ครั้ง - ครั้งแรกตอนเริ่มต้น และครั้งที่สองหลังสแกน
+            if (loadCount > 1) {
+                // หน่วงเวลา 1 วินาทีก่อนแสดงปุ่ม
+                setTimeout(() => {
+                    document.querySelector('.header').style.display = 'flex';
+                }, 1000);
+            }
+        }
+
         function logout() {
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
                 location.reload();
