@@ -15,23 +15,28 @@
             flex-direction: column;
         }
         .header {
-            display: none;  /* เริ่มต้นซ่อนปุ่ม */
+            display: none;
             justify-content: flex-end;
             padding: 10px 20px;
             background: transparent;
-            position: absolute;
-            top: 125px;
-            right: 0;
-            z-index: 1000;
+            position: fixed; /* เปลี่ยนจาก absolute เป็น fixed */
+            top: 130px; /* ปรับตำแหน่งให้อยู่ด้านบนมากขึ้น */
+            right: 20px;
+            z-index: 9999; /* เพิ่ม z-index ให้สูงขึ้น */
         }
         .logout-button {
             padding: 10px 20px;
-            background: none;
+            background-color: rgba(255, 255, 255, 0.2); /* เพิ่มพื้นหลังให้เห็นชัดขึ้น */
             color: white;
-            border: none;
+            border: 1px solid white; /* เพิ่มเส้นขอบ */
+            border-radius: 5px; /* เพิ่มความโค้งมน */
             cursor: pointer;
             font-family: 'Prompt', sans-serif;
-            font-size: 20px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
         .iframe-container {
             flex: 1;
@@ -45,6 +50,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -60,17 +66,31 @@
                 onload="handleFrameLoad()"></iframe>
     </div>
     <script>
+        // เพิ่มการตรวจสอบ URL เพื่อแสดงปุ่ม
+        function checkURLAndShowButton() {
+            const iframe = document.querySelector('iframe');
+            try {
+                const iframeURL = iframe.contentWindow.location.href;
+                if (iframeURL.includes('success') || iframeURL.includes('complete')) {
+                    document.querySelector('.header').style.display = 'flex';
+                }
+            } catch (e) {
+                // ถ้าเกิด error ให้ใช้วิธีนับการโหลดแทน
+                handleFrameLoad();
+            }
+        }
+
         let loadCount = 0;
         
         function handleFrameLoad() {
             loadCount++;
-            // iframe มักจะโหลด 2 ครั้ง - ครั้งแรกตอนเริ่มต้น และครั้งที่สองหลังสแกน
             if (loadCount > 1) {
-                // หน่วงเวลา 1 วินาทีก่อนแสดงปุ่ม
-                setTimeout(() => {
-                    document.querySelector('.header').style.display = 'flex';
-                }, 1000);
+                // แสดงปุ่มทันทีที่โหลดครั้งที่ 2
+                document.querySelector('.header').style.display = 'flex';
             }
+            
+            // เพิ่มการตรวจสอบทุก 1 วินาที
+            setInterval(checkURLAndShowButton, 1000);
         }
 
         function logout() {
@@ -78,6 +98,11 @@
                 location.reload();
             }
         }
+
+        // เพิ่มการแสดงปุ่มเมื่อกดปุ่ม back ใน browser
+        window.onpopstate = function(event) {
+            document.querySelector('.header').style.display = 'flex';
+        };
     </script>
 </body>
 </html>
