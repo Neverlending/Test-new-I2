@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width: 100%, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>MANIT RANONG GROUP</title>
     <style>
         body {
@@ -57,16 +59,23 @@
     </div>
     <div class="iframe-container">
         <iframe scrolling="yes" 
-                src="https://script.google.com/macros/s/AKfycbx20xdt7UpeQi2pW7VSo3kdNMGQW4lVTM3t3uuf4xY7_kF5wy-AFZgquuFBt4aYxG71/exec" 
+                src="https://script.google.com/macros/s/AKfycbyjX5wqZ1DjC4kSxEwVHVHbFEj__ZtMxdNdSvegi9pxhxXcYAmD5vDCTJvyBLMvMmS8Ew/exec" 
                 allow="camera" 
                 frameborder="0"
                 id="myIframe"></iframe>
     </div>
-
     <script>
-
-       
-
+        // เพิ่มโค้ดนี้ใน script ของหน้าหลัก
+        window.addEventListener('load', function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                // ถ้ามี user login อยู่ ให้แสดงปุ่ม logout
+                const header = document.querySelector('.header');
+                header.classList.add('show');
+            }
+        });
+        
+        // ปรับฟังก์ชัน logout
         async function logout() {
             const result = await Swal.fire({
                 title: 'ออกจากระบบ',
@@ -78,7 +87,9 @@
             });
         
             if (result.isConfirmed) {
-                // แสดง Swal อีกครั้งเพื่อบอกว่าออกจากระบบสำเร็จ
+                // ลบข้อมูล user จาก localStorage
+                localStorage.removeItem('currentUser');
+                
                 await Swal.fire({
                     title: 'ออกจากระบบสำเร็จ',
                     icon: 'success',
