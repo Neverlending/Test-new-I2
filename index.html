@@ -16,17 +16,14 @@
             flex-direction: column;
         }
         .header {
-            display: none;
-            justify-content: flex-end;
-            padding: 10px 20px;
-            background: transparent;
             position: fixed;
             top: 125px;
-            right: 0;
+            right: 20px;
             z-index: 1000;
+            display: none;
         }
         .header.show {
-            display: flex;
+            display: block;
         }
         .logout-button {
             padding: 10px 20px;
@@ -65,13 +62,11 @@
     </div>
     <script>
         window.addEventListener('load', function() {
-            // แสดงปุ่ม logout หลังผ่านไป 1 นาที
             setTimeout(() => {
                 const header = document.querySelector('.header');
                 header.classList.add('show');
-            }, 60000); // 60000 มิลลิวินาที = 1 นาที
+            }, 60000);
         });
-
         async function logout() {
             const result = await Swal.fire({
                 title: 'ออกจากระบบ',
