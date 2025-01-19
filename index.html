@@ -66,10 +66,11 @@
     <script>
         // แก้ไขการรับข้อความ
         window.addEventListener('message', function(event) {
-            // ตรวจสอบข้อความและประเภทข้อมูล
             if (event.data.type === 'qrcode' && event.data.status === 'scanComplete') {
-                // แสดงปุ่มออกจากระบบ
-                document.querySelector('.header').classList.add('show');
+                // เพิ่มการหน่วงเวลา 2 วินาทีก่อนแสดงปุ่มออกจากระบบ
+                setTimeout(function() {
+                    document.querySelector('.header').classList.add('show');
+                }, 5000); // 2000 มิลลิวินาที = 2 วินาที
             }
         });
 
