@@ -14,20 +14,17 @@
             display: flex;
             flex-direction: column;
         }
-
         .header {
             display: flex;
             justify-content: flex-end;
             padding: 10px 20px;
             background: transparent;
             position: absolute;
-            top: 0;
+            top: 130px; /* ปรับตำแหน่งของ header ลงมา */
             right: 0;
             z-index: 1000;
         }
-
         .logout-button {
-            top: 135px;
             padding: 10px 20px;
             background: none;
             color: white;
@@ -36,14 +33,12 @@
             font-family: 'Prompt', sans-serif;
             font-size: 18px;
         }
-
         .iframe-container {
             flex: 1;
             position: relative;
             width: 100%;
             height: 100%;
         }
-
         iframe {
             position: absolute;
             top: 0;
@@ -63,7 +58,6 @@
                 src="https://script.google.com/macros/s/AKfycbxb_1tHdr0ayC26RTZPN5Dtj89o_t7ZBPsS7nWEsz9djXeJNq7ICnEl39WRCnh3cwUzxg/exec" 
                 allow="camera" frameborder="0"></iframe>
     </div>
-
     <script>
         function logout() {
             if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
