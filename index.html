@@ -6,16 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" 
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; frame-src https://script.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
-    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- Security Headers (GitHub Pages Compatible) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" 
             defer 
-            integrity="sha384-..." 
             crossorigin="anonymous"></script>
     <title>G2Dock</title>
     <style>
@@ -33,42 +29,40 @@
         }
         
         .header {
-            position: fixed;
+            position: absolute;
             top: 135px;
             right: 20px;
             z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            display: none;
         }
         
         .header.show {
-            opacity: 1;
-            visibility: visible;
+            display: block;
         }
         
         .logout-button {
             padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(255, 107, 107, 0.9);
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
             font-family: 'Prompt', sans-serif;
             font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            white-space: nowrap;
         }
         
         .logout-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
+            background: rgba(255, 107, 107, 1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
         }
         
-        .logout-button:focus {
-            outline: 2px solid #007bff;
-            outline-offset: 2px;
+        .logout-button:active {
+            transform: scale(0.98);
         }
         
         .iframe-container {
@@ -100,7 +94,7 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
-                top: 20px;
+                top: 135px;
                 right: 10px;
             }
             
@@ -260,19 +254,6 @@
             showLogoutButton: function() {
                 const header = document.getElementById('headerElement');
                 header.classList.add('show');
-                
-                // Announce to screen readers
-                const announcement = document.createElement('div');
-                announcement.setAttribute('aria-live', 'polite');
-                announcement.setAttribute('aria-atomic', 'true');
-                announcement.style.position = 'absolute';
-                announcement.style.left = '-10000px';
-                announcement.textContent = 'ปุ่มออกจากระบบพร้อมใช้งานแล้ว';
-                document.body.appendChild(announcement);
-                
-                setTimeout(() => {
-                    document.body.removeChild(announcement);
-                }, 1000);
             }
         };
 
