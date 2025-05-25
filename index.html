@@ -29,15 +29,17 @@
         }
         
         .header {
-            position: absolute;
+            position: fixed;
             top: 135px;
             right: 20px;
             z-index: 1000;
             display: none;
+            transition: opacity 0.3s ease;
         }
         
         .header.show {
             display: block;
+            opacity: 1;
         }
         
         .logout-button {
@@ -206,6 +208,9 @@
                 iframe.addEventListener('load', () => {
                     loadingIndicator.style.display = 'none';
                     console.log('Iframe loaded successfully');
+                    
+                    // Setup scroll detection after iframe loads
+                    this.setupScrollDetection();
                 });
 
                 iframe.addEventListener('error', () => {
@@ -229,6 +234,69 @@
                         this.showLogoutButton();
                     }
                 });
+            },
+
+            setupScrollDetection: function() {
+                const iframe = document.getElementById('mainIframe');
+                const header = document.getElementById('headerElement');
+                let lastScrollTop = 0;
+                let scrollTimeout;
+
+                try {
+                    // Try to access iframe content (may not work due to CORS)
+                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                    
+                    if (iframeDocument) {
+                        iframeDocument.addEventListener('scroll', () => {
+                            const scrollTop = iframeDocument.documentElement.scrollTop || iframeDocument.body.scrollTop;
+                            
+                            // Hide button when scrolling down, show when scrolling up or at top
+                            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                                // Scrolling down
+                                header.style.opacity = '0';
+                                header.style.pointerEvents = 'none';
+                            } else if (scrollTop < lastScrollTop || scrollTop <= 50) {
+                                // Scrolling up or near top
+                                if (header.classList.contains('show')) {
+                                    header.style.opacity = '1';
+                                    header.style.pointerEvents = 'auto';
+                                }
+                            }
+                            
+                            lastScrollTop = scrollTop;
+                            
+                            // Clear timeout and set new one
+                            clearTimeout(scrollTimeout);
+                            scrollTimeout = setTimeout(() => {
+                                // Show button after scroll stops
+                                if (header.classList.contains('show')) {
+                                    header.style.opacity = '1';
+                                    header.style.pointerEvents = 'auto';
+                                }
+                            }, 1000);
+                        });
+                    }
+                } catch (error) {
+                    console.log('Cannot access iframe content due to CORS, using alternative method');
+                    
+                    // Alternative: Use window scroll detection
+                    let isScrolling = false;
+                    
+                    window.addEventListener('scroll', () => {
+                        if (!isScrolling) {
+                            header.style.opacity = '0.5';
+                        }
+                        isScrolling = true;
+                        
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(() => {
+                            isScrolling = false;
+                            if (header.classList.contains('show')) {
+                                header.style.opacity = '1';
+                            }
+                        }, 500);
+                    });
+                }
             },
 
             initializeIframe: function() {
