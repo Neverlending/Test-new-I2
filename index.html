@@ -92,7 +92,7 @@
 </head>
 <body>
     <div class="header" id="headerElement">
-        <button class="logout-button" onclick="logout()" aria-label="ออกจากระบบ">
+        <button class="logout-button" onclick="handleLogout()" aria-label="ออกจากระบบ">
             ออกจากระบบ
         </button>
     </div>
@@ -109,40 +109,212 @@
     </div>
 
     <script>
-        // แสดงปุ่มออกจากระบบหลังจาก 60 วินาที
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                const header = document.querySelector('.header');
-                header.classList.add('show');
-            }, 60000);
-        });
+        // Configuration
+        const CONFIG = {
+            LOGOUT_BUTTON_DELAY: 60000, // 60 seconds
+            SESSION_KEY: 'g2dock_session',
+            IFRAME_TIMEOUT: 30000 // 30 seconds
+        };
 
-        // ฟังก์ชันออกจากระบบ
-        async function logout() {
-            const result = await Swal.fire({
-                title: 'ออกจากระบบ',
-                text: 'คุณต้องการออกจากระบบใช่หรือไม่?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'ใช่',
-                cancelButtonText: 'ยกเลิก'
-            });
+        // Utility functions
+        const utils = {
+            // Secure storage operations
+            setSecureItem: function(key, value) {
+                try {
+                    const encrypted = btoa(JSON.stringify({
+                        data: value,
+                        timestamp: Date.now(),
+                        expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+                    }));
+                    sessionStorage.setItem(key, encrypted);
+                    return true;
+                } catch (error) {
+                    console.error('Storage error:', error);
+                    return false;
+                }
+            },
 
-            if (result.isConfirmed) {
-                localStorage.removeItem('currentUser');
-                await Swal.fire({
-                    title: 'ออกจากระบบสำเร็จ',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
+            getSecureItem: function(key) {
+                try {
+                    const item = sessionStorage.getItem(key);
+                    if (!item) return null;
+                    
+                    const decrypted = JSON.parse(atob(item));
+                    if (decrypted.expires < Date.now()) {
+                        sessionStorage.removeItem(key);
+                        return null;
+                    }
+                    return decrypted.data;
+                } catch (error) {
+                    console.error('Storage retrieval error:', error);
+                    return null;
+                }
+            },
+
+            removeSecureItem: function(key) {
+                try {
+                    sessionStorage.removeItem(key);
+                    return true;
+                } catch (error) {
+                    console.error('Storage removal error:', error);
+                    return false;
+                }
+            },
+
+            // Debounce function
+            debounce: function(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+
+        // Main application logic
+        const app = {
+            init: function() {
+                this.setupEventListeners();
+                this.initializeIframe();
+                this.scheduleLogoutButton();
+            },
+
+            setupEventListeners: function() {
+                // Handle iframe load events
+                const iframe = document.getElementById('mainIframe');
+                const loadingIndicator = document.getElementById('loadingIndicator');
+
+                iframe.addEventListener('load', () => {
+                    loadingIndicator.style.display = 'none';
+                    console.log('Iframe loaded successfully');
                 });
-                location.reload();
+
+                iframe.addEventListener('error', () => {
+                    loadingIndicator.textContent = 'เกิดข้อผิดพลาดในการโหลด';
+                    console.error('Iframe failed to load');
+                });
+
+                // Handle page visibility changes
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        console.log('Page hidden - pausing timers');
+                    } else {
+                        console.log('Page visible - resuming');
+                    }
+                });
+
+                // Handle keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'l') {
+                        e.preventDefault();
+                        this.showLogoutButton();
+                    }
+                });
+            },
+
+            initializeIframe: function() {
+                const iframe = document.getElementById('mainIframe');
+                
+                // Set timeout for iframe loading
+                setTimeout(() => {
+                    if (iframe.contentDocument === null) {
+                        console.warn('Iframe may have failed to load');
+                        document.getElementById('loadingIndicator').textContent = 
+                            'การโหลดใช้เวลานานกว่าปกติ กรุณารอสักครู่';
+                    }
+                }, CONFIG.IFRAME_TIMEOUT);
+            },
+
+            scheduleLogoutButton: function() {
+                // Show logout button after delay
+                setTimeout(() => {
+                    this.showLogoutButton();
+                }, CONFIG.LOGOUT_BUTTON_DELAY);
+            },
+
+            showLogoutButton: function() {
+                const header = document.getElementById('headerElement');
+                header.classList.add('show');
+            }
+        };
+
+        // Logout functionality
+        async function handleLogout() {
+            try {
+                const result = await Swal.fire({
+                    title: 'ออกจากระบบ',
+                    text: 'คุณต้องการออกจากระบบใช่หรือไม่?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'ใช่',
+                    cancelButtonText: 'ยกเลิก',
+                    customClass: {
+                        popup: 'swal-popup',
+                        confirmButton: 'swal-confirm',
+                        cancelButton: 'swal-cancel'
+                    },
+                    focusConfirm: true
+                });
+
+                if (result.isConfirmed) {
+                    // Clear all session data
+                    utils.removeSecureItem(CONFIG.SESSION_KEY);
+                    utils.removeSecureItem('currentUser'); // Legacy support
+                    
+                    // Clear all storage
+                    try {
+                        sessionStorage.clear();
+                        localStorage.removeItem('currentUser'); // Legacy cleanup
+                    } catch (error) {
+                        console.warn('Storage cleanup warning:', error);
+                    }
+
+                    await Swal.fire({
+                        title: 'ออกจากระบบสำเร็จ',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal-popup'
+                        }
+                    });
+
+                    // Force reload without cache
+                    window.location.reload(true);
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                await Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถออกจากระบบได้ กรุณาลองใหม่อีกครั้ง',
+                    icon: 'error',
+                    confirmButtonText: 'ตกลง'
+                });
             }
         }
 
-        // ซ่อน loading เมื่อ iframe โหลดเสร็จ
-        document.getElementById('mainIframe').addEventListener('load', function() {
-            document.getElementById('loadingIndicator').style.display = 'none';
+        // Initialize application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            app.init();
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            console.log('Page unloading - cleanup');
+        });
+
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+
+        // Handle promise rejections
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
         });
     </script>
 </body>
